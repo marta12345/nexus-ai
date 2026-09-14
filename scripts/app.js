@@ -188,7 +188,28 @@ $("#refreshBtn")?.addEventListener("click", refreshLiveData);
 
 /* ---------- PWA service worker ---------- */
 if ("serviceWorker" in navigator) {
-  addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+  addEventListener("load", async () => {
+    try {
+      const reg = await navigator.serviceWorker.register("./sw.js");
+      // Provjeri ima li nova verzija; ako novi SW preuzme kontrolu, osvježi stranicu.
+      reg.addEventListener("updatefound", () => {
+        const nw = reg.installing;
+        nw?.addEventListener("statechange", () => {
+          if (nw.state === "installed" && navigator.serviceWorker.controller) {
+            nw.postMessage?.("skipWaiting");
+          }
+        });
+      });
+      reg.update?.();
+    } catch {}
+  });
+  // Kad se aktivira novi SW, jednom automatski reloadaj da se povuče svježa verzija.
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloaded) return;
+    reloaded = true;
+    location.reload();
+  });
 }
 
 /* ---------- AI chat integracija ---------- */
