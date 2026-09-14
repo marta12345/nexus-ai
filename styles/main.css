@@ -244,8 +244,9 @@ kbd {
 .badge.live-off { color: var(--warn); background: rgba(245,158,11,.14); }
 
 /* ---------- Command palette ---------- */
-.palette-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(3,6,16,.5); backdrop-filter: blur(6px);
+.palette-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(3,6,16,.72);
   display: grid; place-items: start center; padding-top: 12vh; animation: fadeIn .2s forwards; }
+.palette-overlay[hidden] { display: none; }
 .palette { width: min(620px, 92vw); background: var(--surface-solid); border: 1px solid var(--border);
   border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; animation: popIn .25s var(--ease); }
 @keyframes popIn { from { opacity: 0; transform: translateY(-10px) scale(.98); } to { opacity: 1; transform: none; } }
@@ -394,3 +395,7 @@ body { background: var(--bg) !important; }
 /* 5) Blaže, oštrije sjene (manje "mekan" dojam) */
 [data-theme="dark"]  { --shadow: 0 8px 24px rgba(0,0,0,.35); }
 [data-theme="light"] { --shadow: 0 6px 18px rgba(30,41,90,.10); }
+
+
+/* Garancija: [hidden] uvijek znači skriveno (palette, AI panel, scrim) */
+[hidden] { display: none !important; }

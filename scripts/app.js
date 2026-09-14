@@ -171,7 +171,12 @@ overlay?.addEventListener("click", e => { if (e.target === overlay) closePalette
 /* ---------- Global shortcuts & buttons ---------- */
 addEventListener("keydown", e => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); overlay.hidden ? openPalette() : closePalette(); }
-  else if (e.key === "Escape" && !overlay.hidden) closePalette();
+  else if (e.key === "Escape") {
+    // Escape zatvara sve otvorene slojeve odjednom
+    closePalette();
+    $("#aiPanel")?.setAttribute("hidden", "");
+    $("#aiScrim")?.setAttribute("hidden", "");
+  }
 });
 $("#openPaletteBtn")?.addEventListener("click", openPalette);
 $("#paletteBtn")?.addEventListener("click", openPalette);
@@ -200,6 +205,11 @@ setContextProvider(async () => {
 initChat();
 
 /* ---------- Boot ---------- */
+// Osiguraj čist ekran na startu: zatvori palette i AI panel ako su nekako otvoreni.
+closePalette();
+$("#paletteOverlay")?.setAttribute("hidden", "");
+["#aiPanel", "#aiScrim"].forEach((s) => $(s)?.setAttribute("hidden", ""));
+
 initTheme();
 render(currentView());
 setTimeout(() => toast("ok", "Dobrodošli u NexusAI", "Pritisni ⌘K ili klikni ✨ za AI asistenta."), 700);
