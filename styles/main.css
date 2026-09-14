@@ -360,3 +360,37 @@ kbd {
 @media (max-width: 480px) { .grid.stats { grid-template-columns: 1fr; } .topbar { padding: 12px 16px; } }
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+/* =========================================================
+   FLAT MODE — potpuno uklanjanje mutnoće (nadjačava sve gore)
+   ========================================================= */
+
+/* 1) Ugasi SVE blur efekte u aplikaciji */
+* { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+
+/* 2) Ugasi animiranu "aurora" pozadinu (bila je zamućena) */
+.bg-aurora { display: none !important; }
+
+/* 3) Čvrste, potpuno neprozirne površine */
+[data-theme="dark"] {
+  --bg: #0a0e1a;
+  --bg-2: #101528;
+  --surface: #121829;      /* neprozirno */
+  --surface-solid: #182036;
+  --border: rgba(255,255,255,.10);
+}
+[data-theme="light"] {
+  --bg: #f2f4fb;
+  --bg-2: #e9edf7;
+  --surface: #ffffff;      /* neprozirno */
+  --surface-solid: #ffffff;
+  --border: rgba(15,23,42,.12);
+}
+
+/* 4) Jednostavna, čista pozadina bez radial "glowa" */
+body { background: var(--bg) !important; }
+
+/* 5) Blaže, oštrije sjene (manje "mekan" dojam) */
+[data-theme="dark"]  { --shadow: 0 8px 24px rgba(0,0,0,.35); }
+[data-theme="light"] { --shadow: 0 6px 18px rgba(30,41,90,.10); }
