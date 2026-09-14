@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="hr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0f1a" />
+  <meta name="description" content="NexusAI Dashboard — moderna zero-dependency web aplikacija s najnovijim mogućnostima." />
+  <title>NexusAI · Dashboard</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles/main.css" />
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-aurora" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#7c5cff"/>
+                <stop offset="1" stop-color="#22d3ee"/>
+              </linearGradient>
+            </defs>
+            <path d="M6 24V8l10 10L26 8v16" fill="none" stroke="url(#lg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="brand-name">Nexus<b>AI</b></span>
+      </div>
+
+      <nav class="nav" id="nav">
+        <a class="nav-item is-active" data-view="dashboard" href="#dashboard">
+          <span class="nav-ic">◈</span><span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-view="analytics" href="#analytics">
+          <span class="nav-ic">◔</span><span>Analitika</span>
+        </a>
+        <a class="nav-item" data-view="projects" href="#projects">
+          <span class="nav-ic">▦</span><span>Projekti</span>
+        </a>
+        <a class="nav-item" data-view="settings" href="#settings">
+          <span class="nav-ic">⚙</span><span>Postavke</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-foot">
+        <button class="cmdk-hint" id="openPaletteBtn" title="Otvori command palette">
+          <span>Pretraži</span><kbd>⌘</kbd><kbd>K</kbd>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menuBtn" aria-label="Meni">☰</button>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="topbar-actions">
+          <button class="icon-btn" id="paletteBtn" aria-label="Pretraga (⌘K)">⌕</button>
+          <button class="icon-btn" id="refreshBtn" aria-label="Osvježi podatke">↻</button>
+          <button class="icon-btn" id="notifyBtn" aria-label="Notifikacija">🔔</button>
+          <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Promijeni temu">
+            <span class="ic-sun">☀</span><span class="ic-moon">☾</span>
+          </button>
+          <div class="avatar" title="Korisnik">NA</div>
+        </div>
+      </header>
+
+      <main class="content" id="content"><!-- render target --></main>
+    </div>
+  </div>
+
+  <!-- Command palette -->
+  <div class="palette-overlay" id="paletteOverlay" hidden>
+    <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+      <input id="paletteInput" class="palette-input" type="text" placeholder="Upiši naredbu ili pretragu…" autocomplete="off" />
+      <ul class="palette-list" id="paletteList"></ul>
+      <div class="palette-foot"><kbd>↑</kbd><kbd>↓</kbd> navigacija · <kbd>↵</kbd> odaberi · <kbd>esc</kbd> zatvori</div>
+    </div>
+  </div>
+
+  <!-- AI Chat panel -->
+  <button class="ai-fab" id="aiFab" aria-label="Otvori AI asistenta" title="AI asistent">
+    <span class="ai-fab-ic">✨</span>
+  </button>
+  <div class="ai-scrim" id="aiScrim" hidden></div>
+  <aside class="ai-panel" id="aiPanel" aria-label="AI asistent" hidden>
+    <header class="ai-head">
+      <div class="ai-brand">
+        <span class="ai-avatar">✨</span>
+        <div><div class="ai-name">Nexus asistent</div><div class="ai-status" id="aiStatus">lokalni način</div></div>
+      </div>
+      <div class="ai-head-actions">
+        <button class="icon-btn" id="aiSettingsBtn" aria-label="Postavke AI-ja" title="Postavke">⚙</button>
+        <button class="icon-btn" id="aiCloseBtn" aria-label="Zatvori">✕</button>
+      </div>
+    </header>
+
+    <div class="ai-settings" id="aiSettings" hidden>
+      <p class="ai-hint">Radi lokalno bez ključa. Za pametnije odgovore spoji OpenAI-kompatibilan API.</p>
+      <label class="ai-field"><span>API endpoint</span>
+        <input id="aiEndpoint" type="text" placeholder="https://api.openai.com/v1/chat/completions" /></label>
+      <label class="ai-field"><span>API ključ</span>
+        <input id="aiKey" type="password" placeholder="sk-…" /></label>
+      <label class="ai-field"><span>Model</span>
+        <input id="aiModel" type="text" placeholder="gpt-4o-mini" /></label>
+      <div class="ai-settings-actions">
+        <button class="btn-primary" id="aiSaveBtn">Spremi</button>
+        <button class="btn-ghost" id="aiClearBtn">Obriši</button>
+      </div>
+    </div>
+
+    <div class="ai-messages" id="aiMessages"></div>
+
+    <div class="ai-suggestions" id="aiSuggestions"></div>
+
+    <form class="ai-input-row" id="aiForm">
+      <input id="aiInput" class="ai-input" type="text" placeholder="Pitaj bilo što…" autocomplete="off" />
+      <button class="ai-send" type="submit" aria-label="Pošalji">➤</button>
+    </form>
+  </aside>
+
+  <!-- Toasts -->
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <script type="module" src="./scripts/app.js"></script>
+</body>
+</html>

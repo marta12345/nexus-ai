@@ -1,0 +1,13 @@
+{
+  "name": "NexusAI Dashboard",
+  "short_name": "NexusAI",
+  "description": "Moderna zero-dependency web aplikacija — dashboard, analitika, projekti.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070a12",
+  "theme_color": "#070a12",
+  "icons": [
+    { "src": "./assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
