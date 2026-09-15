@@ -99,7 +99,7 @@ function fmtBytes(n) {
   if (n < 1024) return n + " B";
   return (n / 1024).toFixed(1) + " KB";
 }
-function renderStorageView() {
+function renderStorageView(highlightKey) {
   const list = $("#storageList");
   if (!list) return;
   const keys = Object.keys(localStorage).filter((k) => k.startsWith("nexus-"));
@@ -143,11 +143,24 @@ function renderStorageView() {
       }
     });
   });
+
+  // Kratki vizualni bljesak na stavci koja se upravo promijenila
+  if (highlightKey) {
+    const el = list.querySelector(`.storage-item[data-key="${highlightKey}"]`);
+    if (el) { el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 900); }
+  }
 }
+
+/* Osvježi prikaz "Spremljeni podaci" kad se localStorage promijeni (npr. Kanban) */
+window.addEventListener("nexus:storagechange", (e) => {
+  if (currentView() !== "settings") return;      // samo ako gledaš Postavke
+  if (!$("#storageList")) return;
+  renderStorageView(e.detail?.key);
+});
 function escHtml(s) { return String(s).replace(/[&<>]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m])); }
 function initStorageView() {
   renderStorageView();
-  $("#storageRefresh")?.addEventListener("click", renderStorageView);
+  $("#storageRefresh")?.addEventListener("click", () => renderStorageView());
   $("#storageClearAll")?.addEventListener("click", () => {
     const keys = Object.keys(localStorage).filter((k) => k.startsWith("nexus-"));
     if (!keys.length) return;

@@ -82,6 +82,8 @@ function persist() {
     if (el) el.textContent = data[c.id].length;
   });
   onChange(data);
+  // Obavijesti ostatak aplikacije (npr. Postavke → Spremljeni podaci) da se localStorage promijenio.
+  try { window.dispatchEvent(new CustomEvent("nexus:storagechange", { detail: { key: LS_KEY } })); } catch {}
 }
 
 function findCard(id) {

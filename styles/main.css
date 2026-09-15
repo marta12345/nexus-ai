@@ -309,6 +309,11 @@ kbd {
   font: 12px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--text);
   max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
 .storage-empty { color: var(--muted); font-size: 13px; padding: 16px; text-align: center; }
+.storage-item.flash { animation: storageFlash .9s var(--ease); }
+@keyframes storageFlash {
+  0% { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(124,92,255,.25); }
+  100% { border-color: var(--border); box-shadow: none; }
+}
 .storage-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 .btn-danger { padding: 9px 16px; border-radius: 10px; font: 600 13px var(--font); cursor: pointer;
   border: 1px solid rgba(239,68,68,.4); background: rgba(239,68,68,.12); color: var(--bad); }
