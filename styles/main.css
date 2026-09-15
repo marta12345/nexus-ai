@@ -289,6 +289,31 @@ kbd {
   background: linear-gradient(90deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .live-value-label { color: var(--muted); font-size: 13px; }
 
+/* ---------- Spremljeni podaci (Postavke) ---------- */
+.storage-list { display: flex; flex-direction: column; gap: 10px; }
+.storage-item { border: 1px solid var(--border); border-radius: 12px; background: var(--surface-solid); overflow: hidden; }
+.storage-row { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 12px; padding: 12px 14px; }
+.storage-ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 16px;
+  background: linear-gradient(135deg, rgba(124,92,255,.22), rgba(34,211,238,.14)); }
+.storage-info .name { font-weight: 600; font-size: 14px; }
+.storage-info .sub { color: var(--muted); font-size: 12px; }
+.storage-size { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.storage-btns { display: flex; gap: 6px; }
+.storage-btns button { width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--border); cursor: pointer;
+  background: var(--surface); color: var(--muted); font-size: 13px; transition: color .2s, background .2s, border-color .2s; }
+.storage-btns button:hover { color: var(--text); border-color: var(--brand); }
+.storage-btns .st-del:hover { color: var(--bad); border-color: var(--bad); background: rgba(239,68,68,.1); }
+.storage-detail { display: none; padding: 0 14px 14px; }
+.storage-item.open .storage-detail { display: block; }
+.storage-detail pre { margin: 0; padding: 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border);
+  font: 12px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--text);
+  max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+.storage-empty { color: var(--muted); font-size: 13px; padding: 16px; text-align: center; }
+.storage-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.btn-danger { padding: 9px 16px; border-radius: 10px; font: 600 13px var(--font); cursor: pointer;
+  border: 1px solid rgba(239,68,68,.4); background: rgba(239,68,68,.12); color: var(--bad); }
+.btn-danger:hover { background: rgba(239,68,68,.2); }
+
 /* ---------- Notifikacijski centar ---------- */
 .notif-wrap { position: relative; }
 .notif-badge { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px;

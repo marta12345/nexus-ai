@@ -84,6 +84,79 @@ function render(view) {
       if (confirm("Vratiti Kanban ploču na početno stanje?")) { resetKanban(); toast("info", "Kanban resetiran", "Ploča je vraćena na zadano."); }
     });
   }
+  if (view === "settings") initStorageView();
+}
+
+/* ---------- Pregled spremljenih podataka (localStorage) ---------- */
+const STORAGE_INFO = {
+  "nexus-kanban":    { ic: "📋", name: "Kanban ploča", desc: "Kolone i kartice na stranici Projekti" },
+  "nexus-theme":     { ic: "🌗", name: "Tema", desc: "Odabrana tema (tamna/svijetla)" },
+  "nexus-ai-chat":   { ic: "💬", name: "Povijest AI chata", desc: "Spremljene poruke razgovora" },
+  "nexus-ai-config": { ic: "🤖", name: "AI postavke", desc: "Endpoint, ključ i model asistenta" },
+  "nexus-notifs":    { ic: "🔔", name: "Obavijesti", desc: "Popis obavijesti i status pročitanog" },
+};
+function fmtBytes(n) {
+  if (n < 1024) return n + " B";
+  return (n / 1024).toFixed(1) + " KB";
+}
+function renderStorageView() {
+  const list = $("#storageList");
+  if (!list) return;
+  const keys = Object.keys(localStorage).filter((k) => k.startsWith("nexus-"));
+  let total = 0;
+  list.innerHTML = keys.length
+    ? keys.map((k) => {
+        const raw = localStorage.getItem(k) || "";
+        const bytes = new Blob([raw]).size;
+        total += bytes;
+        const meta = STORAGE_INFO[k] || { ic: "📦", name: k, desc: "Nepoznati podatak" };
+        let pretty = raw;
+        try { pretty = JSON.stringify(JSON.parse(raw), null, 2); } catch {}
+        // za AI config sakrij ključ
+        if (k === "nexus-ai-config") pretty = pretty.replace(/("key":\s*")[^"]*(")/g, "$1•••••$2");
+        return `<div class="storage-item" data-key="${k}">
+          <div class="storage-row">
+            <div class="storage-ic">${meta.ic}</div>
+            <div class="storage-info"><div class="name">${meta.name}</div><div class="sub">${meta.desc} · <code>${k}</code></div></div>
+            <div class="storage-size">${fmtBytes(bytes)}</div>
+            <div class="storage-btns">
+              <button class="st-view" title="Prikaži sadržaj">👁</button>
+              <button class="st-del" title="Obriši">🗑</button>
+            </div>
+          </div>
+          <div class="storage-detail"><pre>${escHtml(pretty)}</pre></div>
+        </div>`;
+      }).join("")
+    : `<div class="storage-empty">Nema spremljenih podataka. Kad koristiš aplikaciju (npr. pomakneš Kanban karticu), pojavit će se ovdje.</div>`;
+  const badge = $("#storageTotal");
+  if (badge) badge.textContent = `${keys.length} stavki · ${fmtBytes(total)}`;
+
+  // eventi
+  list.querySelectorAll(".storage-item").forEach((item) => {
+    const key = item.dataset.key;
+    item.querySelector(".st-view")?.addEventListener("click", () => item.classList.toggle("open"));
+    item.querySelector(".st-del")?.addEventListener("click", () => {
+      if (confirm(`Obrisati "${STORAGE_INFO[key]?.name || key}"? Ova radnja je nepovratna.`)) {
+        localStorage.removeItem(key);
+        toast("ok", "Obrisano", `${STORAGE_INFO[key]?.name || key} je uklonjen.`);
+        renderStorageView();
+      }
+    });
+  });
+}
+function escHtml(s) { return String(s).replace(/[&<>]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m])); }
+function initStorageView() {
+  renderStorageView();
+  $("#storageRefresh")?.addEventListener("click", renderStorageView);
+  $("#storageClearAll")?.addEventListener("click", () => {
+    const keys = Object.keys(localStorage).filter((k) => k.startsWith("nexus-"));
+    if (!keys.length) return;
+    if (confirm("Obrisati SVE spremljene podatke aplikacije? Tema, Kanban, chat i obavijesti bit će vraćeni na početno.")) {
+      keys.forEach((k) => localStorage.removeItem(k));
+      toast("warn", "Svi podaci obrisani", "Aplikacija je vraćena na početno stanje.");
+      renderStorageView();
+    }
+  });
 }
 
 /* ---------- Live data (realni API-ji + fallback) ---------- */

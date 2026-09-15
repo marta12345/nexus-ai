@@ -222,6 +222,22 @@ export function settings() {
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">💾 Spremljeni podaci (u pregledniku)</div>
+        <span class="badge info" id="storageTotal">—</span>
+      </div>
+      <p style="color:var(--muted);line-height:1.6;font-size:13.5px;margin-bottom:14px">
+        Aplikacija sve pohranjuje lokalno u <b style="color:var(--text)">localStorage</b> tvog preglednika — ništa se ne šalje na server.
+        Podaci ostaju i nakon zatvaranja preglednika, ali su vezani samo uz ovaj uređaj i preglednik.
+      </p>
+      <div id="storageList" class="storage-list"></div>
+      <div class="storage-actions">
+        <button class="btn-ghost" id="storageRefresh" type="button">↻ Osvježi</button>
+        <button class="btn-danger" id="storageClearAll" type="button">🗑 Obriši sve podatke</button>
+      </div>
+    </div>
   </section>`;
 }
 
