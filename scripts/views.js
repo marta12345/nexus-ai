@@ -19,7 +19,6 @@ function statCard(icon, label, value, delta, up) {
 }
 
 export function dashboard() {
-  const revenue = series(12, 40, 95);
   const bars = series(7, 20, 100);
   return `<section class="view">
     <div class="grid stats">
@@ -31,9 +30,15 @@ export function dashboard() {
 
     <div class="grid split">
       <div class="card">
-        <div class="card-head"><div class="card-title">Prihod tijekom vremena</div>
-          <span class="badge info">Live</span></div>
-        ${lineChart(revenue)}
+        <div class="card-head">
+          <div class="card-title">Promet u stvarnom vremenu</div>
+          <span class="badge live-on">● uživo</span>
+        </div>
+        <div class="live-head">
+          <span class="live-value" id="liveValue">—</span>
+          <span class="live-value-label">zahtjeva / s</span>
+        </div>
+        <div id="liveChart"></div>
       </div>
       <div class="card">
         <div class="card-head"><div class="card-title">Izvori prometa</div></div>

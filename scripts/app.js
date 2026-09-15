@@ -5,6 +5,7 @@ import { VIEWS, TITLES, renderMarket, renderWeather, renderRates } from "./views
 import { fetchCrypto, fetchRates, fetchWeather, weatherLabel } from "./api.js";
 import { initChat, openChat, setNavigator, setContextProvider } from "./chat.js";
 import { initKanban, resetKanban } from "./kanban.js";
+import { LiveChart } from "./livechart.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -53,6 +54,7 @@ function animateProgress() {
 
 /* ---------- Router ---------- */
 const content = $("#content");
+let liveChart = null;   // aktivna instanca live grafikona (samo na dashboardu)
 function render(view) {
   if (!VIEWS[view]) view = "dashboard";
   content.innerHTML = VIEWS[view]();
@@ -62,7 +64,20 @@ function render(view) {
   animateProgress();
   bindViewControls();
   $("#sidebar")?.classList.remove("open");
-  if (view === "dashboard") loadLiveData();
+
+  // Live grafikon: aktivan samo na dashboardu (pauzira se drugdje da štedi resurse)
+  if (liveChart) { liveChart.stop(); liveChart = null; }
+  if (view === "dashboard") {
+    loadLiveData();
+    const mount = $("#liveChart");
+    if (mount) {
+      liveChart = new LiveChart(mount, {
+        label: "Promet", unit: "", min: 20, max: 320, interval: 1400,
+        valueEl: $("#liveValue"),
+      });
+      liveChart.start();
+    }
+  }
   if (view === "projects") {
     initKanban();
     $("#kanbanReset")?.addEventListener("click", () => {
@@ -269,6 +284,13 @@ document.addEventListener("click", (e) => {
 renderNotifs();
 $("#menuBtn")?.addEventListener("click", () => $("#sidebar").classList.toggle("open"));
 $("#refreshBtn")?.addEventListener("click", refreshLiveData);
+
+/* ---------- Pauziraj live grafikon kad je tab u pozadini ---------- */
+document.addEventListener("visibilitychange", () => {
+  if (!liveChart) return;
+  if (document.hidden) liveChart.stop();
+  else if (currentView() === "dashboard") liveChart.start();
+});
 
 /* ---------- PWA service worker ---------- */
 if ("serviceWorker" in navigator) {

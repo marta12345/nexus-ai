@@ -274,6 +274,21 @@ kbd {
 @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
 @keyframes toastOut { to { opacity: 0; transform: translateX(40px); } }
 
+/* ---------- Live chart (real-time) ---------- */
+.live-chart { width: 100%; height: 220px; display: block; }
+.live-chart .lc-area { fill: url(#liveArea); }
+.live-chart .lc-line { fill: none; stroke: url(#liveLine); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  transition: d .6s linear; }
+.live-chart .lc-head { fill: var(--surface-solid); stroke: url(#liveLine); stroke-width: 2.5; transition: cx .6s linear, cy .6s linear; }
+.live-chart .lc-pulse { fill: #22d3ee; opacity: .6; transform-origin: center; transition: cx .6s linear, cy .6s linear;
+  animation: lcPulse 1.6s var(--ease) infinite; }
+@keyframes lcPulse { 0% { r: 4.5; opacity: .6; } 70% { r: 16; opacity: 0; } 100% { r: 4.5; opacity: 0; } }
+
+.live-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.live-value { font-size: 30px; font-weight: 800; letter-spacing: .5px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.live-value-label { color: var(--muted); font-size: 13px; }
+
 /* ---------- Notifikacijski centar ---------- */
 .notif-wrap { position: relative; }
 .notif-badge { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px;
