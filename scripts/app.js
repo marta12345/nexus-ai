@@ -110,10 +110,6 @@ function renderStorageView(highlightKey) {
         const bytes = new Blob([raw]).size;
         total += bytes;
         const meta = STORAGE_INFO[k] || { ic: "📦", name: k, desc: "Nepoznati podatak" };
-        let pretty = raw;
-        try { pretty = JSON.stringify(JSON.parse(raw), null, 2); } catch {}
-        // za AI config sakrij ključ
-        if (k === "nexus-ai-config") pretty = pretty.replace(/("key":\s*")[^"]*(")/g, "$1•••••$2");
         return `<div class="storage-item" data-key="${k}">
           <div class="storage-row">
             <div class="storage-ic">${meta.ic}</div>
@@ -124,7 +120,7 @@ function renderStorageView(highlightKey) {
               <button class="st-del" title="Obriši">🗑</button>
             </div>
           </div>
-          <div class="storage-detail"><pre>${escHtml(pretty)}</pre></div>
+          <div class="storage-detail">${formatDetail(k, raw)}</div>
         </div>`;
       }).join("")
     : `<div class="storage-empty">Nema spremljenih podataka. Kad koristiš aplikaciju (npr. pomakneš Kanban karticu), pojavit će se ovdje.</div>`;
@@ -158,6 +154,35 @@ window.addEventListener("nexus:storagechange", (e) => {
   renderStorageView(e.detail?.key);
 });
 function escHtml(s) { return String(s).replace(/[&<>]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m])); }
+
+/* Prikaz detalja stavke: Kanban → pregledna tablica, ostalo → JSON */
+const KANBAN_COL_LABELS = { todo: "📋 Za napraviti", doing: "⚙️ U tijeku", done: "✅ Gotovo" };
+function formatDetail(key, raw) {
+  if (key === "nexus-kanban") {
+    try {
+      const data = JSON.parse(raw);
+      const rows = [];
+      ["todo", "doing", "done"].forEach((col) => {
+        (data[col] || []).forEach((card) => rows.push({ col, text: card.text, tag: card.tag || "ostalo" }));
+      });
+      if (!rows.length) return `<div class="storage-empty">Ploča je prazna.</div>`;
+      return `<table class="storage-table">
+        <thead><tr><th>Kartica</th><th>Oznaka</th><th>Kolona</th></tr></thead>
+        <tbody>${rows.map((r) => `<tr>
+          <td>${escHtml(r.text)}</td>
+          <td><span class="tbl-tag">${escHtml(r.tag)}</span></td>
+          <td>${KANBAN_COL_LABELS[r.col] || r.col}</td>
+        </tr>`).join("")}</tbody>
+      </table>`;
+    } catch { /* fallback na JSON */ }
+  }
+  // Ostali ključevi → JSON (uz maskiranje AI ključa)
+  let pretty = raw;
+  try { pretty = JSON.stringify(JSON.parse(raw), null, 2); } catch {}
+  if (key === "nexus-ai-config") pretty = pretty.replace(/("key":\s*")[^"]*(")/g, "$1•••••$2");
+  return `<pre>${escHtml(pretty)}</pre>`;
+}
+
 function initStorageView() {
   renderStorageView();
   $("#storageRefresh")?.addEventListener("click", () => renderStorageView());
