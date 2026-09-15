@@ -66,7 +66,16 @@
         <div class="topbar-actions">
           <button class="icon-btn" id="paletteBtn" aria-label="Pretraga (⌘K)">⌕</button>
           <button class="icon-btn" id="refreshBtn" aria-label="Osvježi podatke">↻</button>
-          <button class="icon-btn" id="notifyBtn" aria-label="Notifikacija">🔔</button>
+          <div class="notif-wrap">
+            <button class="icon-btn" id="notifyBtn" aria-label="Obavijesti">🔔<span class="notif-badge" id="notifBadge" hidden>0</span></button>
+            <div class="notif-panel" id="notifPanel" hidden>
+              <div class="notif-head">
+                <span>Obavijesti</span>
+                <button class="notif-readall" id="notifReadAll" type="button">Označi sve pročitano</button>
+              </div>
+              <ul class="notif-list" id="notifList"></ul>
+            </div>
+          </div>
           <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Promijeni temu">
             <span class="ic-sun">☀</span><span class="ic-moon">☾</span>
           </button>
@@ -99,6 +108,7 @@
         <div><div class="ai-name">Nexus asistent</div><div class="ai-status" id="aiStatus">lokalni način</div></div>
       </div>
       <div class="ai-head-actions">
+        <button class="icon-btn" id="aiClearChatBtn" aria-label="Obriši razgovor" title="Obriši razgovor">🗑</button>
         <button class="icon-btn" id="aiSettingsBtn" aria-label="Postavke AI-ja" title="Postavke">⚙</button>
         <button class="icon-btn" id="aiCloseBtn" aria-label="Zatvori">✕</button>
       </div>

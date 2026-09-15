@@ -4,6 +4,7 @@
 import { VIEWS, TITLES, renderMarket, renderWeather, renderRates } from "./views.js";
 import { fetchCrypto, fetchRates, fetchWeather, weatherLabel } from "./api.js";
 import { initChat, openChat, setNavigator, setContextProvider } from "./chat.js";
+import { initKanban, resetKanban } from "./kanban.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -62,6 +63,12 @@ function render(view) {
   bindViewControls();
   $("#sidebar")?.classList.remove("open");
   if (view === "dashboard") loadLiveData();
+  if (view === "projects") {
+    initKanban();
+    $("#kanbanReset")?.addEventListener("click", () => {
+      if (confirm("Vratiti Kanban ploču na početno stanje?")) { resetKanban(); toast("info", "Kanban resetiran", "Ploča je vraćena na zadano."); }
+    });
+  }
 }
 
 /* ---------- Live data (realni API-ji + fallback) ---------- */
@@ -85,6 +92,11 @@ async function refreshLiveData() {
   toast(d.c.live ? "ok" : "warn",
     d.c.live ? "Podaci osvježeni" : "Offline način",
     d.c.live ? "Dohvaćeni najnoviji tržišni podaci." : "Prikazani demo podaci — API nedostupan.");
+  if (d.c.live) {
+    const btc = d.c.items.find((x) => x.id === "BTC");
+    if (btc) pushNotification("market", "Tržište osvježeno",
+      `Bitcoin: $${btc.price.toLocaleString("hr-HR", { maximumFractionDigits: 0 })} (${btc.change >= 0 ? "▲" : "▼"} ${Math.abs(btc.change).toFixed(1)}%)`);
+  }
 }
 // auto-refresh svakih 60s dok si na dashboardu
 setInterval(() => { if (currentView() === "dashboard") loadLiveData(); }, 60000);
@@ -181,8 +193,80 @@ addEventListener("keydown", e => {
 $("#openPaletteBtn")?.addEventListener("click", openPalette);
 $("#paletteBtn")?.addEventListener("click", openPalette);
 $("#themeToggle")?.addEventListener("click", toggleTheme);
-$("#notifyBtn")?.addEventListener("click", () =>
-  toast("info", "Nova aktivnost", "Aurora API je upravo deployan. 🚀"));
+/* ---------- Notifikacijski centar ---------- */
+const NOTIF_KEY = "nexus-notifs";
+const NOTIF_ICONS = { info: "ℹ️", ok: "✅", warn: "⚠️", deploy: "🚀", market: "📈" };
+let notifs = loadNotifs();
+
+function loadNotifs() {
+  try {
+    const raw = localStorage.getItem(NOTIF_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  // Zadane demo obavijesti (prvi put)
+  const now = Date.now();
+  return [
+    { id: 1, type: "deploy", title: "Aurora API deployan", msg: "Verzija v2.3 je uživo u produkciji.", ts: now - 3 * 60000, read: false },
+    { id: 2, type: "market", title: "BTC skočio +3%", msg: "Bitcoin je prešao dnevni prag.", ts: now - 42 * 60000, read: false },
+    { id: 3, type: "ok", title: "Backup dovršen", msg: "Dnevni backup baze uspješno spremljen.", ts: now - 3 * 3600000, read: true },
+  ];
+}
+function saveNotifs() { try { localStorage.setItem(NOTIF_KEY, JSON.stringify(notifs.slice(0, 50))); } catch {} }
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return "upravo sad";
+  const m = Math.floor(s / 60); if (m < 60) return `prije ${m} min`;
+  const h = Math.floor(m / 60); if (h < 24) return `prije ${h} h`;
+  return `prije ${Math.floor(h / 24)} d`;
+}
+function renderNotifs() {
+  const list = $("#notifList");
+  const unread = notifs.filter((n) => !n.read).length;
+  const badge = $("#notifBadge");
+  if (badge) { badge.textContent = unread; badge.hidden = unread === 0; }
+  if (!list) return;
+  list.innerHTML = notifs.length
+    ? notifs.map((n) => `<li class="notif-item ${n.read ? "" : "unread"}" data-id="${n.id}">
+        <div class="notif-ic">${NOTIF_ICONS[n.type] || "🔔"}</div>
+        <div class="notif-body">
+          <div class="notif-title">${n.title}</div>
+          <div class="notif-msg">${n.msg}</div>
+          <div class="notif-time">${timeAgo(n.ts)}</div>
+        </div>
+        <span class="notif-dot"></span>
+      </li>`).join("")
+    : `<div class="notif-empty">Nema novih obavijesti 🎉</div>`;
+  list.querySelectorAll(".notif-item").forEach((li) =>
+    li.addEventListener("click", () => {
+      const n = notifs.find((x) => x.id == li.dataset.id);
+      if (n && !n.read) { n.read = true; saveNotifs(); renderNotifs(); }
+    }));
+}
+function toggleNotifPanel(force) {
+  const p = $("#notifPanel");
+  if (!p) return;
+  const show = force !== undefined ? force : p.hidden;
+  p.hidden = !show;
+}
+export function pushNotification(type, title, msg) {
+  notifs.unshift({ id: Date.now(), type, title, msg, ts: Date.now(), read: false });
+  saveNotifs();
+  renderNotifs();
+}
+
+$("#notifyBtn")?.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
+$("#notifReadAll")?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  notifs.forEach((n) => (n.read = true)); saveNotifs(); renderNotifs();
+  toast("ok", "Označeno", "Sve obavijesti su pročitane.");
+});
+// klik izvan panela zatvara ga
+document.addEventListener("click", (e) => {
+  const panel = $("#notifPanel");
+  if (panel && !panel.hidden && !e.target.closest(".notif-wrap")) toggleNotifPanel(false);
+});
+renderNotifs();
 $("#menuBtn")?.addEventListener("click", () => $("#sidebar").classList.toggle("open"));
 $("#refreshBtn")?.addEventListener("click", refreshLiveData);
 

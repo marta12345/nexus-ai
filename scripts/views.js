@@ -2,6 +2,7 @@
    Views — HTML za svaki ekran
    ========================================================= */
 import { lineChart, barChart, donutChart } from "./charts.js";
+import { kanbanHTML } from "./kanban.js";
 
 const rnd = (a, b) => Math.round(a + Math.random() * (b - a));
 const series = (n, a, b) => Array.from({ length: n }, () => rnd(a, b));
@@ -168,6 +169,15 @@ function projectRows(n) {
 
 export function projects() {
   return `<section class="view">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Kanban ploča</div>
+        <button class="btn-ghost" id="kanbanReset" type="button">↺ Resetiraj</button>
+      </div>
+      ${kanbanHTML()}
+      <div class="sub" style="margin-top:12px">💡 Povuci kartice između kolona · sve se pamti u pregledniku</div>
+    </div>
+
     <div class="card">
       <div class="card-head"><div class="card-title">Svi projekti</div><span class="badge ok">6 aktivnih</span></div>
       ${projectRows(6)}

@@ -1,5 +1,5 @@
 /* NexusAI — Service Worker (network-first, s offline fallbackom) */
-const CACHE = "nexus-ai-v4";
+const CACHE = "nexus-ai-v5";
 
 /* Dopusti stranici da natjera novu verziju da odmah preuzme kontrolu. */
 self.addEventListener("message", (e) => { if (e.data === "skipWaiting") self.skipWaiting(); });
@@ -12,6 +12,7 @@ const ASSETS = [
   "./scripts/charts.js",
   "./scripts/api.js",
   "./scripts/chat.js",
+  "./scripts/kanban.js",
   "./manifest.webmanifest",
   "./assets/favicon.svg",
 ];

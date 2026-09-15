@@ -22,24 +22,57 @@ function saveConfig(cfg) {
 }
 let config = loadConfig();
 
+/* ---------- Povijest razgovora (localStorage) ---------- */
+const CHAT_KEY = "nexus-ai-chat";
+let transcript = loadTranscript();       // [{role, html}]
+function loadTranscript() {
+  try { return JSON.parse(localStorage.getItem(CHAT_KEY)) || []; } catch { return []; }
+}
+function saveTranscript() {
+  try { localStorage.setItem(CHAT_KEY, JSON.stringify(transcript.slice(-50))); } catch {}
+}
+function clearTranscript() {
+  transcript = [];
+  try { localStorage.removeItem(CHAT_KEY); } catch {}
+  history.length = 0;
+}
+
 /* ---------- Panel open/close ---------- */
 const panel = $("#aiPanel"), scrim = $("#aiScrim"), fab = $("#aiFab");
 export function openChat() {
   panel.hidden = false; scrim.hidden = false;
   setTimeout(() => $("#aiInput")?.focus(), 60);
-  if (!$("#aiMessages").children.length) greet();
+  if (!$("#aiMessages").children.length) {
+    if (transcript.length) restoreHistory();
+    else greet();
+  }
+}
+
+/* Ponovno iscrtaj spremljene poruke pri otvaranju */
+function restoreHistory() {
+  const box = $("#aiMessages");
+  box.innerHTML = "";
+  transcript.forEach((m) => {
+    const el = document.createElement("div");
+    el.className = `msg ${m.role}`;
+    el.innerHTML = `<div class="m-ic">${m.role === "user" ? "🧑" : "✨"}</div><div class="bubble">${m.html}</div>`;
+    box.appendChild(el);
+  });
+  box.scrollTop = box.scrollHeight;
+  renderSuggestions(DEFAULT_SUGGESTIONS);
 }
 export function closeChat() { panel.hidden = true; scrim.hidden = true; }
 export function toggleChat() { panel.hidden ? openChat() : closeChat(); }
 
 /* ---------- Poruke ---------- */
-function addMessage(role, html) {
+function addMessage(role, html, persist = true) {
   const box = $("#aiMessages");
   const el = document.createElement("div");
   el.className = `msg ${role}`;
   el.innerHTML = `<div class="m-ic">${role === "user" ? "🧑" : "✨"}</div><div class="bubble">${html}</div>`;
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
+  if (persist) { transcript.push({ role, html }); saveTranscript(); }
   return el;
 }
 function typingIndicator() {
@@ -55,7 +88,8 @@ function typingIndicator() {
 function greet() {
   addMessage("bot",
     "Bok! 👋 Ja sam <b>Nexus asistent</b>. Mogu ti reći o <b>tržištu</b>, <b>vremenu</b> i <b>tečajevima</b> uživo, " +
-    "pomoći s navigacijom ili odgovoriti na općenita pitanja. Kliknem li na ⚙, možeš spojiti i pravi AI model.");
+    "pomoći s navigacijom ili odgovoriti na općenita pitanja. Kliknem li na ⚙, možeš spojiti i pravi AI model.",
+    false);
   renderSuggestions(DEFAULT_SUGGESTIONS);
 }
 
@@ -219,6 +253,14 @@ export function initChat() {
   $("#aiCloseBtn").addEventListener("click", closeChat);
   scrim.addEventListener("click", closeChat);
   $("#aiForm").addEventListener("submit", (e) => { e.preventDefault(); submit(); });
+  $("#aiClearChatBtn")?.addEventListener("click", () => {
+    if (!transcript.length) return;
+    if (confirm("Obrisati cijeli razgovor?")) {
+      clearTranscript();
+      $("#aiMessages").innerHTML = "";
+      greet();
+    }
+  });
   bindSettings();
   refreshStatus();
   addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) closeChat(); });
