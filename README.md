@@ -48,7 +48,7 @@ nexus-ai/
 
 ## 🤖 AI asistent — spajanje pravog modela (opcionalno)
 
-Klikni ✨ (dolje desno) pa ⚙ u panelu i unesi:
+Klikni 🧙 (dolje desno) pa ⚙ u panelu i unesi:
 - **Endpoint** — npr. `https://api.openai.com/v1/chat/completions`
 - **Ključ** — tvoj API ključ (čuva se samo u tvom pregledniku, `localStorage`)
 - **Model** — npr. `gpt-4o-mini`

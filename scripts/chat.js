@@ -55,7 +55,7 @@ function restoreHistory() {
   transcript.forEach((m) => {
     const el = document.createElement("div");
     el.className = `msg ${m.role}`;
-    el.innerHTML = `<div class="m-ic">${m.role === "user" ? "🧑" : "✨"}</div><div class="bubble">${m.html}</div>`;
+    el.innerHTML = `<div class="m-ic">${m.role === "user" ? "🧑" : "🧙"}</div><div class="bubble">${m.html}</div>`;
     box.appendChild(el);
   });
   box.scrollTop = box.scrollHeight;
@@ -69,7 +69,7 @@ function addMessage(role, html, persist = true) {
   const box = $("#aiMessages");
   const el = document.createElement("div");
   el.className = `msg ${role}`;
-  el.innerHTML = `<div class="m-ic">${role === "user" ? "🧑" : "✨"}</div><div class="bubble">${html}</div>`;
+  el.innerHTML = `<div class="m-ic">${role === "user" ? "🧑" : "🧙"}</div><div class="bubble">${html}</div>`;
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
   if (persist) { transcript.push({ role, html }); saveTranscript(); }
@@ -79,7 +79,7 @@ function typingIndicator() {
   const box = $("#aiMessages");
   const el = document.createElement("div");
   el.className = "msg bot";
-  el.innerHTML = `<div class="m-ic">✨</div><div class="bubble"><span class="typing"><span></span><span></span><span></span></span></div>`;
+  el.innerHTML = `<div class="m-ic">🧙</div><div class="bubble"><span class="typing"><span></span><span></span><span></span></span></div>`;
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
   return el;

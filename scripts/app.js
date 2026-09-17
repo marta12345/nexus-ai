@@ -267,7 +267,7 @@ const COMMANDS = [
   { ic: "▦", label: "Idi na Projekte", hint: "navigacija", run: () => navigate("projects") },
   { ic: "⚙", label: "Idi na Postavke", hint: "navigacija", run: () => navigate("settings") },
   { ic: "🌗", label: "Prebaci temu (tamno/svijetlo)", hint: "akcija", run: toggleTheme },
-  { ic: "✨", label: "Otvori AI asistenta", hint: "akcija", run: openChat },
+  { ic: "🧙", label: "Otvori AI asistenta", hint: "akcija", run: openChat },
   { ic: "🔔", label: "Testiraj notifikaciju", hint: "akcija", run: () => toast("ok", "Radi!", "Ovo je test notifikacija.") },
   { ic: "↻", label: "Osvježi tržišne podatke", hint: "akcija", run: refreshLiveData },
 ];
@@ -450,4 +450,4 @@ $("#paletteOverlay")?.setAttribute("hidden", "");
 
 initTheme();
 render(currentView());
-setTimeout(() => toast("ok", "Dobrodošli u NexusAI", "Pritisni ⌘K ili klikni ✨ za AI asistenta."), 700);
+setTimeout(() => toast("ok", "Dobrodošli u NexusAI", "Pritisni ⌘K ili klikni 🧙 za AI asistenta."), 700);
